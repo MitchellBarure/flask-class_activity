@@ -19,6 +19,33 @@ def linear_search(arr, target):
             return True
     return False
 
+# Binary search
+def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return True
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return False
+
+# Nested loops (O(n^2))
+def nested_loops(n):
+    count = 0
+    for i in range(n):
+        for j in range(n):
+            count += 1
+    return count
+
+# Exponential example: recursive Fibonacci (O(2^n))
+def fib_recursive(n):
+    if n <= 1:
+        return n
+    return fib_recursive(n - 1) + fib_recursive(n - 2)
+
 
 def run_analysis(algo, n, steps):
     if steps < 1:
@@ -42,8 +69,21 @@ def run_analysis(algo, n, steps):
             target = data[-1]
             linear_search(data, target)
             complexity = "O(n)"
+        elif algo == "binary":
+            data = sorted([random.randint(0, 100000) for _ in range(size)])
+            target = data[-1]
+            binary_search(data, target)
+            complexity = "O(log n)"
+        elif algo == "nested":
+            nested_loops(size)
+            complexity = "O(n^2)"
+        elif algo == "exponential":
+            # Exponential algorithms explode quickly, so map size to a safe fib input
+            fib_n = min(28, max(1, size // 10))
+            fib_recursive(fib_n)
+            complexity = "O(2^n)"
         else:
-            raise ValueError("Algorithm is not supported. Use: bubble or linear")
+            raise ValueError("Algorithm is not supported. Use: bubble, linear, binary, nested or exponential")
 
         end = time.perf_counter()
 
