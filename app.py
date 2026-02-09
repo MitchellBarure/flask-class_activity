@@ -12,12 +12,38 @@ app = Flask(__name__)
 @app.route("/analyze", methods=["GET"])
 def analyze():
     algo = request.args.get("algo")
-    n = int(request.args.get("n"))
-    steps = int(request.args.get("steps",10))
+    n_raw = request.args.get("n")
+    steps_raw = request.args.get("steps",10)
+
+    # Validate algo
+    if not algo:
+        return jsonify({"error": "Missing required query parameter: algo"}), 400
+
+    # Validate n
+    try:
+        n = int(n_raw)
+        if n < 1:
+            return jsonify({"error": "n must be a positive integer"}), 400
+    except (TypeError, ValueError):
+        return jsonify({"error": "n must be an integer"}), 400
+
+    # Validate steps
+    try:
+        steps = int(steps_raw)
+        if steps < 1:
+            return jsonify({"error": "steps must be a positive integer"}), 400
+    except (TypeError, ValueError):
+        return jsonify({"error": "steps must be an integer"}), 400
 
     start_time = time.time()
 
-    analysis = run_analysis(algo, n, steps)
+    try:
+        analysis = run_analysis(algo, n, steps)
+    except ValueError as e:
+        return jsonify({
+            "error": str(e),
+            "supported_algos": ["bubble", "linear", "binary", "nested", "exponential"]
+        }), 400
 
     #Create and return graph as base64-encoded string via plotting function
     graph_base64 = make_graph_base64(
